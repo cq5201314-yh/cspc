@@ -591,14 +591,51 @@
                 { name: 'thingproxy', url: 'https://thingproxy.freeboard.io/fetch/' },
                 { name: 'corsproxy', url: 'https://corsproxy.github.io/?' },
                 { name: 'xy68', url: 'https://proxy.xy68.workers.dev/?' },
-                { name: 'junfree', url: 'https://proxy.jun_free.eu.org/' }
+                { name: 'junfree', url: 'https://proxy.jun_free.eu.org/' },
+                { name: 'raw', url: 'https://raw.githack.com/' },
+                { name: 'cors-anywhere', url: 'https://cors-anywhere.herokuapp.com/' }
             ],
             TIMEOUT: 15000,
             MAX_CONCURRENT: 5,
             MAX_DEEP_LINKS: 20,
             CACHE_TTL: 120000,
-            USER_AGENT: 'Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
+            USER_AGENT: 'Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+            USER_AGENTS: [
+                'Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36',
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+                'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15'
+            ]
         };
+
+        // 原图URL模式替换规则（将缩略图URL转为原图URL）
+        const ORIGINAL_IMAGE_PATTERNS = [
+            { pattern: /\/thumb\//gi, replace: '/' },
+            { pattern: /\/thumbnail\//gi, replace: '/' },
+            { pattern: /\/small\//gi, replace: '/' },
+            { pattern: /\/medium\//gi, replace: '/' },
+            { pattern: /\/thumbnails\//gi, replace: '/' },
+            { pattern: /\/preview\//gi, replace: '/' },
+            { pattern: /\/cache\//gi, replace: '/' },
+            { pattern: /_small\./gi, replace: '.' },
+            { pattern: /_thumb\./gi, replace: '.' },
+            { pattern: /_thumbnail\./gi, replace: '.' },
+            { pattern: /_preview\./gi, replace: '.' },
+            { pattern: /_medium\./gi, replace: '.' },
+            { pattern: /_min\./gi, replace: '.' },
+            { pattern: /-small\./gi, replace: '.' },
+            { pattern: /-thumb\./gi, replace: '.' },
+            { pattern: /_(\d+)x(\d+)\./gi, replace: '.' },
+            { pattern: /-(\d+)x(\d+)\./gi, replace: '.' },
+            { pattern: /@(\d+)w(\d+)h\./gi, replace: '.' },
+            { pattern: /@(\d+)x(\d+)\./gi, replace: '.' },
+            { pattern: /\?s=\d+/gi, replace: '' },
+            { pattern: /\?size=\d+/gi, replace: '' },
+            { pattern: /\?width=\d+/gi, replace: '' },
+            { pattern: /\?height=\d+/gi, replace: '' },
+            { pattern: /&s=\d+/gi, replace: '' },
+            { pattern: /&size=\d+/gi, replace: '' }
+        ];
 
         // 资源类型正则
         const REGEX_RULES = {
@@ -674,6 +711,23 @@
                 try { return new URL('https://' + url).href; }
                 catch (e2) { return null; }
             }
+        }
+
+        function getOriginalUrl(url) {
+            if (!url) return url;
+            let result = url;
+            ORIGINAL_IMAGE_PATTERNS.forEach(({ pattern, replace }) => {
+                result = result.replace(pattern, replace);
+            });
+            result = result.replace(/\/+/g, '/');
+            if (result !== url) {
+                log(`原图转换: ${url.substring(0, 50)}... -> ${result.substring(0, 50)}...`);
+            }
+            return result;
+        }
+
+        function randomUserAgent() {
+            return CONFIG.USER_AGENTS[Math.floor(Math.random() * CONFIG.USER_AGENTS.length)];
         }
 
         function getExtension(url) {
@@ -857,12 +911,12 @@
             }
         }
 
-        // 并发代理请求
+        // 并发代理请求（带反爬虫绕过）
         async function fetchWithProxy(url) {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
+            const ua = randomUserAgent();
 
-            // 所有代理并发请求，返回第一个成功的
             const promises = CONFIG.PROXIES.map(proxy =>
                 fetch(proxy.url + encodeURIComponent(url), {
                     method: 'GET',
@@ -870,7 +924,19 @@
                     headers: {
                         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-                        'User-Agent': CONFIG.USER_AGENT
+                        'User-Agent': ua,
+                        'Referer': url,
+                        'Accept-Encoding': 'gzip, deflate',
+                        'Connection': 'keep-alive',
+                        'Cache-Control': 'max-age=0',
+                        'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                        'Sec-Ch-Ua-Mobile': '?0',
+                        'Sec-Ch-Ua-Platform': '"Windows"',
+                        'Sec-Fetch-Dest': 'document',
+                        'Sec-Fetch-Mode': 'navigate',
+                        'Sec-Fetch-Site': 'none',
+                        'Sec-Fetch-User': '?1',
+                        'Upgrade-Insecure-Requests': '1'
                     }
                 })
                 .then(async r => {
@@ -977,7 +1043,7 @@
                     });
                 }
 
-                // 图片（支持多种懒加载属性）
+                // 图片（支持多种懒加载属性 + 原图提取）
                 if (types.includes('image')) {
                     const imageAttrs = ['src', 'data-src', 'data-original', 'data-lazy-src', 'data-srcset', 'srcset', 'data-url', 'data-large', 'data-hd', 'data-big', 'data-original-src'];
                     
@@ -1005,10 +1071,16 @@
                         if (!src || isIconUrl(src)) return;
                         
                         try {
-                            const fullUrl = new URL(src, base).href;
-                            if (!seen.has(fullUrl) && fullUrl.length < 2000) {
+                            let fullUrl = new URL(src, base).href;
+                            const originalUrl = getOriginalUrl(fullUrl);
+                            
+                            if (!seen.has(originalUrl) && originalUrl.length < 2000) {
+                                seen.add(originalUrl);
+                                results.push(createResult(originalUrl, 'image', baseUrl));
+                            }
+                            
+                            if (originalUrl !== fullUrl && !seen.has(fullUrl)) {
                                 seen.add(fullUrl);
-                                results.push(createResult(fullUrl, 'image', baseUrl));
                             }
                         } catch (e) {}
                     });
@@ -1021,10 +1093,12 @@
                         const bgMatch = style.match(/background[^;]*url\(['"]?([^'")]+)['"]?\)/i);
                         if (bgMatch && bgMatch[1].startsWith('http')) {
                             try {
-                                const fullUrl = new URL(bgMatch[1], base).href;
-                                if (!seen.has(fullUrl) && fullUrl.length < 2000) {
-                                    seen.add(fullUrl);
-                                    results.push(createResult(fullUrl, 'image', baseUrl));
+                                let fullUrl = new URL(bgMatch[1], base).href;
+                                const originalUrl = getOriginalUrl(fullUrl);
+                                
+                                if (!seen.has(originalUrl) && originalUrl.length < 2000) {
+                                    seen.add(originalUrl);
+                                    results.push(createResult(originalUrl, 'image', baseUrl));
                                 }
                             } catch (e) {}
                         }
