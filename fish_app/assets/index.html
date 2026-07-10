@@ -977,10 +977,31 @@
                     });
                 }
 
-                // 图片
+                // 图片（支持多种懒加载属性）
                 if (types.includes('image')) {
-                    doc.querySelectorAll('img[src], img[data-src], img[data-original]').forEach(img => {
-                        const src = img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('data-original');
+                    const imageAttrs = ['src', 'data-src', 'data-original', 'data-lazy-src', 'data-srcset', 'srcset', 'data-url', 'data-large', 'data-hd', 'data-big', 'data-original-src'];
+                    
+                    doc.querySelectorAll('img').forEach(img => {
+                        let src = null;
+                        for (const attr of imageAttrs) {
+                            const val = img.getAttribute(attr);
+                            if (val && val.startsWith('http')) {
+                                src = val;
+                                break;
+                            }
+                        }
+                        
+                        if (!src) {
+                            const srcset = img.getAttribute('srcset');
+                            if (srcset) {
+                                const parts = srcset.split(',');
+                                if (parts.length > 0) {
+                                    const match = parts[parts.length - 1].trim().match(/https?:\/\/\S+/);
+                                    if (match) src = match[0];
+                                }
+                            }
+                        }
+                        
                         if (!src || isIconUrl(src)) return;
                         
                         try {
@@ -990,6 +1011,23 @@
                                 results.push(createResult(fullUrl, 'image', baseUrl));
                             }
                         } catch (e) {}
+                    });
+
+                    // 提取背景图样式中的图片URL
+                    doc.querySelectorAll('div, section, article').forEach(el => {
+                        const style = el.getAttribute('style');
+                        if (!style) return;
+                        
+                        const bgMatch = style.match(/background[^;]*url\(['"]?([^'")]+)['"]?\)/i);
+                        if (bgMatch && bgMatch[1].startsWith('http')) {
+                            try {
+                                const fullUrl = new URL(bgMatch[1], base).href;
+                                if (!seen.has(fullUrl) && fullUrl.length < 2000) {
+                                    seen.add(fullUrl);
+                                    results.push(createResult(fullUrl, 'image', baseUrl));
+                                }
+                            } catch (e) {}
+                        }
                     });
                 }
 
