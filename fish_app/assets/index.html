@@ -95,37 +95,32 @@
             border-color: #4CAF50;
         }
 
-        .type-btn .icon {
-            margin-right: 4px;
-        }
-
-        .filter-box {
+        .options-box {
             background: #F5F5F5;
             border-radius: 10px;
             padding: 10px;
             margin-bottom: 10px;
         }
 
-        .filter-row {
+        .option-row {
             display: flex;
-            gap: 6px;
+            gap: 8px;
+            align-items: center;
             margin-bottom: 6px;
+            flex-wrap: wrap;
         }
 
-        .filter-row:last-child {
-            margin-bottom: 0;
-        }
+        .option-row:last-child { margin-bottom: 0; }
 
-        .filter-label {
+        .option-label {
             font-size: 11px;
             color: #666;
-            white-space: nowrap;
-            padding-top: 6px;
-            min-width: 60px;
+            min-width: 50px;
         }
 
-        .filter-input {
+        .option-input {
             flex: 1;
+            min-width: 80px;
             padding: 6px 10px;
             border: 1px solid #DDD;
             border-radius: 6px;
@@ -133,9 +128,18 @@
             outline: none;
         }
 
-        .filter-input:focus {
-            border-color: #2196F3;
+        .option-input:focus { border-color: #2196F3; }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #555;
+            cursor: pointer;
         }
+
+        .checkbox-item input { cursor: pointer; }
 
         .input-group {
             display: flex;
@@ -184,26 +188,19 @@
             box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
         }
 
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
+        .btn-primary:active { transform: scale(0.98); }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .status {
             padding: 10px;
             text-align: center;
             color: #1565C0;
-            font-size: 13px;
+            font-size: 12px;
             display: none;
         }
 
-        .status.active {
-            display: block;
-        }
+        .status.active { display: block; }
 
         .progress-bar {
             height: 4px;
@@ -220,9 +217,22 @@
             transition: width 0.3s;
         }
 
-        .result-section {
-            margin-top: 12px;
+        .log-area {
+            margin-top: 8px;
+            max-height: 80px;
+            overflow-y: auto;
+            font-size: 10px;
+            color: #666;
+            background: #FAFAFA;
+            border-radius: 6px;
+            padding: 6px;
+            font-family: monospace;
+            display: none;
         }
+
+        .log-area.active { display: block; }
+
+        .result-section { margin-top: 12px; }
 
         .section-header {
             display: flex;
@@ -248,10 +258,7 @@
             font-size: 11px;
         }
 
-        .section-actions {
-            display: flex;
-            gap: 6px;
-        }
+        .section-actions { display: flex; gap: 6px; }
 
         .btn-tiny {
             padding: 5px 10px;
@@ -262,20 +269,10 @@
             font-weight: 500;
         }
 
-        .btn-copy-all {
-            background: #E3F2FD;
-            color: #1565C0;
-        }
+        .btn-copy-all { background: #E3F2FD; color: #1565C0; }
+        .btn-export { background: #FFF3E0; color: #E65100; }
 
-        .btn-export {
-            background: #FFF3E0;
-            color: #E65100;
-        }
-
-        .result-grid {
-            display: grid;
-            gap: 8px;
-        }
+        .result-grid { display: grid; gap: 8px; }
 
         .result-card {
             background: white;
@@ -302,11 +299,9 @@
         .result-icon.img { background: linear-gradient(135deg, #2196F3, #1976D2); }
         .result-icon.video { background: linear-gradient(135deg, #FF5722, #E64A19); }
         .result-icon.audio { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
+        .result-icon.link { background: linear-gradient(135deg, #607D8B, #455A64); }
 
-        .result-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .result-info { flex: 1; min-width: 0; }
 
         .result-name {
             font-size: 13px;
@@ -331,10 +326,7 @@
             margin-top: 2px;
         }
 
-        .result-actions {
-            display: flex;
-            gap: 4px;
-        }
+        .result-actions { display: flex; gap: 4px; }
 
         .btn-action {
             padding: 6px 10px;
@@ -345,20 +337,9 @@
             font-weight: 500;
         }
 
-        .btn-download {
-            background: linear-gradient(135deg, #4CAF50, #388E3C);
-            color: white;
-        }
-
-        .btn-copy {
-            background: #E3F2FD;
-            color: #1565C0;
-        }
-
-        .btn-open {
-            background: #FFF8E1;
-            color: #F57C00;
-        }
+        .btn-download { background: linear-gradient(135deg, #4CAF50, #388E3C); color: white; }
+        .btn-copy { background: #E3F2FD; color: #1565C0; }
+        .btn-open { background: #FFF8E1; color: #F57C00; }
 
         .image-grid {
             display: grid;
@@ -392,10 +373,7 @@
             color: #90CAF9;
         }
 
-        .empty-state .icon {
-            font-size: 40px;
-            margin-bottom: 8px;
-        }
+        .empty-state .icon { font-size: 40px; margin-bottom: 8px; }
 
         .stats {
             font-size: 11px;
@@ -404,9 +382,7 @@
             margin-top: 6px;
         }
 
-        .download-panel {
-            display: none;
-        }
+        .download-panel { display: none; }
 
         .download-item {
             background: white;
@@ -429,10 +405,7 @@
             font-size: 16px;
         }
 
-        .download-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .download-info { flex: 1; min-width: 0; }
 
         .download-name {
             font-size: 12px;
@@ -487,19 +460,14 @@
             transition: opacity 0.3s;
         }
 
-        .toast.show {
-            opacity: 1;
-        }
+        .toast.show { opacity: 1; }
 
         @keyframes pulse {
             0%, 100% { opacity: 0.4; }
             50% { opacity: 1; }
         }
 
-        .loading-dots span {
-            animation: pulse 1.4s infinite;
-        }
-
+        .loading-dots span { animation: pulse 1.4s infinite; }
         .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
         .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
     </style>
@@ -507,7 +475,7 @@
 <body>
     <div class="header">
         <h1>🐟 鱼</h1>
-        <p>多类型资源爬虫 · 高速并发下载</p>
+        <p>多类型资源爬虫 · 深度爬取 · 高速并发</p>
     </div>
 
     <div class="search-box">
@@ -519,41 +487,45 @@
 
         <div class="type-selector">
             <button class="type-btn active" data-type="apk" onclick="setCrawlType('apk')">
-                <span class="icon">📦</span>APK
+                <span>📦</span>APK
             </button>
             <button class="type-btn" data-type="image" onclick="setCrawlType('image')">
-                <span class="icon">🖼️</span>图片
+                <span>🖼️</span>图片
             </button>
             <button class="type-btn" data-type="video" onclick="setCrawlType('video')">
-                <span class="icon">🎬</span>视频
+                <span>🎬</span>视频
             </button>
             <button class="type-btn" data-type="audio" onclick="setCrawlType('audio')">
-                <span class="icon">🎵</span>音频
+                <span>🎵</span>音频
             </button>
             <button class="type-btn" data-type="all" onclick="setCrawlType('all')">
-                <span class="icon">📋</span>全部
+                <span>📋</span>全部
             </button>
         </div>
 
-        <div class="filter-box" id="filterBox">
-            <div class="filter-row">
-                <span class="filter-label">包含:</span>
-                <input type="text" class="filter-input" id="includeFilter" placeholder="关键词1, 关键词2">
+        <div class="options-box">
+            <div class="option-row">
+                <span class="option-label">包含:</span>
+                <input type="text" class="option-input" id="includeFilter" placeholder="关键词">
+                <span class="option-label">排除:</span>
+                <input type="text" class="option-input" id="excludeFilter" placeholder="关键词">
             </div>
-            <div class="filter-row">
-                <span class="filter-label">排除:</span>
-                <input type="text" class="filter-input" id="excludeFilter" placeholder="关键词1, 关键词2">
-            </div>
-            <div class="filter-row">
-                <span class="filter-label">最小:</span>
-                <input type="text" class="filter-input" id="minSizeFilter" placeholder="最小文件大小，如: 1MB">
+            <div class="option-row">
+                <label class="checkbox-item">
+                    <input type="checkbox" id="deepCrawl" checked> 深度爬取（进详情页）
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="showLog"> 显示日志
+                </label>
+                <span class="option-label">深度:</span>
+                <input type="number" class="option-input" id="maxDepth" value="2" style="width:50px;min-width:40px">
             </div>
         </div>
 
         <div id="batchInfo" class="batch-info" style="display:none;">💡 每行一个网址，并发爬取</div>
 
         <div class="input-group">
-            <input type="text" class="url-input" id="urlInput" placeholder="输入目标网址">
+            <input type="text" class="url-input" id="urlInput" placeholder="输入目标网址，如：m.onlinedown.net">
             <button class="btn btn-primary" id="crawlBtn" onclick="startCrawl()">开始</button>
         </div>
 
@@ -561,6 +533,7 @@
             <span class="loading-dots">正在爬取<span>.</span><span>.</span><span>.</span></span>
             <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
         </div>
+        <div class="log-area" id="logArea"></div>
         <div class="stats" id="stats"></div>
     </div>
 
@@ -581,7 +554,7 @@
                 <span class="section-count" id="resultCount">0</span>
             </div>
             <div class="section-actions">
-                <button class="btn-tiny btn-copy-all" onclick="copyAllUrls()">📋 复制全部</button>
+                <button class="btn-tiny btn-copy-all" onclick="copyAllUrls()">📋 复制</button>
                 <button class="btn-tiny btn-export" onclick="exportResults()">📤 导出</button>
             </div>
         </div>
@@ -594,7 +567,7 @@
                 🖼️ 图片预览 <span class="section-count" id="imageCount">0</span>
             </div>
             <div class="section-actions">
-                <button class="btn-tiny btn-copy-all" onclick="copyAllUrls()">📋 复制全部</button>
+                <button class="btn-tiny btn-copy-all" onclick="copyAllUrls()">📋 复制</button>
             </div>
         </div>
         <div class="image-grid" id="imageGrid"></div>
@@ -603,47 +576,61 @@
     <div id="emptyState" class="empty-state" style="display:none;">
         <div class="icon">🔍</div>
         <p>未找到匹配的资源</p>
+        <p style="font-size:11px;margin-top:4px;color:#90CAF9;">试试开启深度爬取，或更换网址</p>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        // 配置
+        // ============= 配置 =============
         const CONFIG = {
             PROXIES: [
-                'https://api.allorigins.win/raw?url=',
-                'https://corsproxy.io/?',
-                'https://api.codetabs.com/v1/proxy?quest='
+                { name: 'allorigins', url: 'https://api.allorigins.win/raw?url=' },
+                { name: 'corsproxy.io', url: 'https://corsproxy.io/?' },
+                { name: 'codetabs', url: 'https://api.codetabs.com/v1/proxy?quest=' },
+                { name: 'thingproxy', url: 'https://thingproxy.freeboard.io/fetch/' },
+                { name: 'corsproxy', url: 'https://corsproxy.github.io/?' },
+                { name: 'xy68', url: 'https://proxy.xy68.workers.dev/?' },
+                { name: 'junfree', url: 'https://proxy.jun_free.eu.org/' }
             ],
-            TIMEOUT: 10000,
+            TIMEOUT: 15000,
             MAX_CONCURRENT: 5,
-            CACHE_TTL: 60000,
-            USER_AGENT: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            MAX_DEEP_LINKS: 20,
+            CACHE_TTL: 120000,
+            USER_AGENT: 'Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
         };
 
-        // 正则规则
+        // 资源类型正则
         const REGEX_RULES = {
             apk: [
-                /https?:\/\/[^\s"'<>]+\.apk([^\s"'<>]*)?/gi,
-                /https?:\/\/[^\s"'<>]*\/download\/[^\s"'<>]*\.apk/gi,
-                /https?:\/\/[^\s"'<>]*\/uploads?\/[^\s"'<>]*\.apk/gi
+                /https?:\/\/[^\s"'<>()]+?\.apk(\?[^\s"'<>()]*)?/gi,
+                /https?:\/\/[^\s"'<>()]+?\/download[^"'<>()]*\.apk/gi,
+                /https?:\/\/[^\s"'<>()]+?\/down[^"'<>()]*\.apk/gi,
             ],
             image: [
-                /https?:\/\/[^\s"'<>]+\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?[^\s"'<>]*)?/gi,
-                /https?:\/\/[^\s"'<>]*\/uploads?\/[^\s"'<>]*\.(jpg|jpeg|png|gif|webp)/gi,
-                /https?:\/\/[^\s"'<>]*\/images?\/[^\s"'<>]*\.(jpg|jpeg|png|gif|webp)/gi
+                /https?:\/\/[^\s"'<>()]+?\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?[^\s"'<>()]*)?/gi,
             ],
             video: [
-                /https?:\/\/[^\s"'<>]+\.(mp4|mkv|avi|mov|wmv|flv|webm)(\?[^\s"'<>]*)?/gi,
-                /https?:\/\/[^\s"'<>]*\/videos?\/[^\s"'<>]*\.(mp4|mkv|avi|mov|webm)/gi,
-                /https?:\/\/[^\s"'<>]*\/download\/[^\s"'<>]*\.(mp4|mkv|avi|mov|webm)/gi
+                /https?:\/\/[^\s"'<>()]+?\.(mp4|mkv|avi|mov|wmv|flv|webm|m3u8)(\?[^\s"'<>()]*)?/gi,
             ],
             audio: [
-                /https?:\/\/[^\s"'<>]+\.(mp3|flac|wav|aac|ogg|m4a|wma)(\?[^\s"'<>]*)?/gi,
-                /https?:\/\/[^\s"'<>]*\/audio\/[^\s"'<>]*\.(mp3|flac|wav|aac|ogg|m4a)/gi,
-                /https?:\/\/[^\s"'<>]*\/music\/[^\s"'<>]*\.(mp3|flac|wav|aac|ogg|m4a)/gi
+                /https?:\/\/[^\s"'<>()]+?\.(mp3|flac|wav|aac|ogg|m4a|wma)(\?[^\s"'<>()]*)?/gi,
             ]
         };
+
+        // 详情页链接特征（用来识别软件/资源详情页）
+        const DETAIL_PAGE_PATTERNS = [
+            /\/soft\//i, /\/app\//i, /\/detail\//i, /\/item\//i,
+            /\/view\//i, /\/product\//i, /\/show\//i, /\/game\//i,
+            /-(\d+)\.html?$/i, /\/\d+\.html?$/i,
+            /id=\d+/i, /softid=/i, /appid=/i
+        ];
+
+        // 下载按钮/链接特征
+        const DOWNLOAD_ATTR_PATTERNS = [
+            'data-url', 'data-link', 'data-download', 'data-href',
+            'down-url', 'download-url', 'dl-url'
+        ];
 
         // 状态
         let state = {
@@ -652,10 +639,66 @@
             results: [],
             cache: {},
             downloads: [],
-            abortController: null
+            seenUrls: new Set(),
+            deepLinks: new Set()
         };
 
-        // 设置爬取模式
+        // ============= 工具函数 =============
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function log(msg) {
+            const logArea = document.getElementById('logArea');
+            if (logArea.classList.contains('active')) {
+                const time = new Date().toLocaleTimeString();
+                logArea.innerHTML += `[${time}] ${escapeHtml(msg)}<br>`;
+                logArea.scrollTop = logArea.scrollHeight;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function normalizeUrl(url) {
+            if (!url) return null;
+            try {
+                return new URL(url).href;
+            } catch (e) {
+                try { return new URL('https://' + url).href; }
+                catch (e2) { return null; }
+            }
+        }
+
+        function getExtension(url) {
+            const match = url.match(/\.(\w{2,5})(\?|$)/i);
+            return match ? match[1].toLowerCase() : '';
+        }
+
+        function detectType(url) {
+            const lower = url.toLowerCase();
+            if (lower.includes('.apk')) return 'apk';
+            if (/\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?|$)/i.test(url)) return 'image';
+            if (/\.(mp4|mkv|avi|mov|wmv|flv|webm|m3u8)(\?|$)/i.test(url)) return 'video';
+            if (/\.(mp3|flac|wav|aac|ogg|m4a|wma)(\?|$)/i.test(url)) return 'audio';
+            return null;
+        }
+
+        function isIconUrl(src) {
+            const lower = src.toLowerCase();
+            return lower.includes('icon') || lower.includes('emoji') || 
+                   lower.includes('loading') || lower.includes('spacer') ||
+                   lower.endsWith('.svg') || lower.includes('data:image') ||
+                   lower.includes('favicon');
+        }
+
+        // ============= 模式切换 =============
         function setMode(mode) {
             state.mode = mode;
             document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
@@ -670,27 +713,17 @@
                 batchInfo.style.display = 'inline-block';
             } else {
                 input.classList.remove('multiline');
-                input.placeholder = '输入目标网址';
+                input.placeholder = '输入目标网址，如：m.onlinedown.net';
                 batchInfo.style.display = 'none';
             }
         }
 
-        // 设置爬取类型
         function setCrawlType(type) {
             state.crawlType = type;
             document.querySelectorAll('.type-btn').forEach(t => t.classList.remove('active'));
             event.target.closest('.type-btn').classList.add('active');
         }
 
-        // 显示提示
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-
-        // 切换下载面板
         function toggleDownloads() {
             const panel = document.getElementById('downloadPanel');
             const resultSection = document.getElementById('resultSection');
@@ -698,7 +731,7 @@
             
             if (panel.style.display === 'block') {
                 panel.style.display = 'none';
-                resultSection.style.display = state.results.length > 0 ? 'block' : 'none';
+                resultSection.style.display = state.results.filter(r => r.type !== 'image').length > 0 ? 'block' : 'none';
                 imageSection.style.display = state.results.some(r => r.type === 'image') ? 'block' : 'none';
             } else {
                 panel.style.display = 'block';
@@ -708,135 +741,162 @@
             }
         }
 
-        // 开始爬取
+        document.getElementById('showLog').addEventListener('change', function() {
+            document.getElementById('logArea').classList.toggle('active', this.checked);
+        });
+
+        // ============= 主爬取流程 =============
         async function startCrawl() {
             const input = document.getElementById('urlInput').value.trim();
-            if (!input) {
-                showToast('请输入网址');
-                return;
-            }
+            if (!input) { showToast('请输入网址'); return; }
 
             const urls = state.mode === 'batch' 
                 ? input.split('\n').map(u => normalizeUrl(u.trim())).filter(u => u)
                 : [normalizeUrl(input)].filter(u => u);
 
-            if (urls.length === 0) {
-                showToast('请输入有效的网址');
-                return;
-            }
+            if (urls.length === 0) { showToast('请输入有效的网址'); return; }
 
             // 初始化
             state.results = [];
-            state.abortController = new AbortController();
+            state.seenUrls = new Set();
+            state.deepLinks = new Set();
             
             document.getElementById('crawlBtn').disabled = true;
             document.getElementById('status').classList.add('active');
             document.getElementById('progressBar').style.width = '0%';
             document.getElementById('stats').textContent = '';
+            document.getElementById('logArea').innerHTML = '';
             
             hideAllResults();
 
+            const deepCrawl = document.getElementById('deepCrawl').checked;
+            const maxDepth = parseInt(document.getElementById('maxDepth').value) || 2;
             const startTime = Date.now();
             let completed = 0;
+            const totalTasks = [];
 
-            try {
-                // 并发爬取
-                const batchSize = Math.min(urls.length, CONFIG.MAX_CONCURRENT);
-                const batches = [];
-                
-                for (let i = 0; i < urls.length; i += batchSize) {
-                    batches.push(urls.slice(i, i + batchSize));
-                }
-
-                for (let batch of batches) {
-                    const promises = batch.map(url => crawlUrl(url));
-                    await Promise.allSettled(promises);
-                    
-                    completed += batch.length;
-                    const progress = Math.round((completed / urls.length) * 100);
-                    document.getElementById('progressBar').style.width = progress + '%';
-                    document.getElementById('status').innerHTML = 
-                        `<span class="loading-dots">正在爬取 ${completed}/${urls.length}<span>.</span><span>.</span><span>.</span></span>
-                        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>`;
-                }
-
-                applyFilters();
-                renderResults();
-                
-                const elapsed = Date.now() - startTime;
-                document.getElementById('stats').textContent = 
-                    `完成！共 ${urls.length} 个网址，找到 ${state.results.length} 个资源，耗时 ${elapsed}ms`;
-            } catch (error) {
-                console.error('爬取失败:', error);
-                showToast('爬取失败: ' + error.message);
-            } finally {
-                document.getElementById('status').classList.remove('active');
-                document.getElementById('crawlBtn').disabled = false;
+            // 第一层：爬取输入的URLs
+            for (const url of urls) {
+                totalTasks.push({ url, depth: 1 });
             }
+
+            log(`开始爬取 ${urls.length} 个网址，深度爬取: ${deepCrawl ? '开启' : '关闭'}`);
+
+            // 广度优先爬取
+            let taskQueue = [...totalTasks];
+            let processed = 0;
+
+            while (taskQueue.length > 0 && processed < 50) {
+                const batch = taskQueue.splice(0, CONFIG.MAX_CONCURRENT);
+                
+                const promises = batch.map(task => crawlPage(task.url, task.depth, deepCrawl, maxDepth));
+                await Promise.allSettled(promises);
+                
+                processed += batch.length;
+                completed += batch.length;
+                
+                const progress = Math.min(100, Math.round((processed / Math.max(processed + taskQueue.length, 1)) * 100));
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('status').innerHTML = 
+                    `<span class="loading-dots">爬取中 ${processed} 页，找到 ${state.results.length} 个资源<span>.</span><span>.</span><span>.</span></span>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>`;
+            }
+
+            // 过滤并渲染
+            applyFilters();
+            renderResults();
+            
+            const elapsed = Date.now() - startTime;
+            document.getElementById('stats').textContent = 
+                `完成！共爬取 ${processed} 个页面，找到 ${state.results.length} 个资源，耗时 ${elapsed}ms`;
+            log(`爬取完成，找到 ${state.results.length} 个资源`);
+            
+            document.getElementById('status').classList.remove('active');
+            document.getElementById('crawlBtn').disabled = false;
         }
 
-        // 标准化URL
-        function normalizeUrl(url) {
-            if (!url) return null;
-            try {
-                return new URL(url).href;
-            } catch (e) {
-                try {
-                    return new URL('https://' + url).href;
-                } catch (e2) {
-                    return null;
-                }
-            }
-        }
+        // 爬取单个页面
+        async function crawlPage(url, depth, deepCrawl, maxDepth) {
+            if (state.seenUrls.has(url)) return;
+            state.seenUrls.add(url);
 
-        // 爬取单个URL
-        async function crawlUrl(url) {
             // 检查缓存
             if (state.cache[url] && Date.now() - state.cache[url].time < CONFIG.CACHE_TTL) {
+                log(`缓存命中: ${url.substring(0, 50)}...`);
                 state.results.push(...state.cache[url].results);
                 return;
             }
 
-            const html = await fetchWithProxy(url);
-            if (!html) throw new Error('无法获取内容');
+            log(`爬取 (深度${depth}): ${url.substring(0, 60)}...`);
 
-            const results = parseContent(html, url);
-            
-            // 缓存
-            state.cache[url] = {
-                time: Date.now(),
-                results: results
-            };
+            try {
+                const html = await fetchWithProxy(url);
+                if (!html) throw new Error('获取内容失败');
 
-            state.results.push(...results);
+                const results = parseContent(html, url);
+                
+                // 缓存
+                state.cache[url] = { time: Date.now(), results: [...results] };
+                state.results.push(...results);
+
+                // 深度爬取：找详情页链接
+                if (deepCrawl && depth < maxDepth) {
+                    const detailLinks = findDetailLinks(html, url);
+                    log(`  发现 ${detailLinks.length} 个详情页链接`);
+                    
+                    for (const link of detailLinks) {
+                        if (!state.seenUrls.has(link) && state.deepLinks.size < CONFIG.MAX_DEEP_LINKS) {
+                            state.deepLinks.add(link);
+                            // 延迟递归爬取
+                            setTimeout(() => crawlPage(link, depth + 1, deepCrawl, maxDepth), 0);
+                        }
+                    }
+                }
+            } catch (e) {
+                log(`  失败: ${e.message}`);
+            }
         }
 
-        // 并发代理请求（返回最快的）
+        // 并发代理请求
         async function fetchWithProxy(url) {
-            const { signal } = state.abortController;
-            
-            const promises = CONFIG.PROXIES.map(proxy => 
-                fetch(proxy + encodeURIComponent(url), {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
+
+            // 所有代理并发请求，返回第一个成功的
+            const promises = CONFIG.PROXIES.map(proxy =>
+                fetch(proxy.url + encodeURIComponent(url), {
                     method: 'GET',
-                    signal,
+                    signal: controller.signal,
                     headers: {
                         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+                        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                        'User-Agent': CONFIG.USER_AGENT
                     }
                 })
-                .then(r => {
+                .then(async r => {
                     if (!r.ok) throw new Error('HTTP ' + r.status);
-                    return r.text();
+                    const text = await r.text();
+                    if (text && text.length > 100 && !text.includes('error code:') && !text.includes('Server-side requests')) {
+                        return text;
+                    }
+                    throw new Error('invalid response');
                 })
                 .catch(() => null)
             );
 
-            // 返回第一个成功的结果
-            const results = await Promise.all(promises);
-            return results.find(r => r !== null) || null;
+            try {
+                const results = await Promise.all(promises);
+                clearTimeout(timeout);
+                const valid = results.find(r => r !== null);
+                if (valid) return valid;
+                throw new Error('所有代理都失败');
+            } catch (e) {
+                clearTimeout(timeout);
+                throw e;
+            }
         }
 
-        // 解析内容
+        // ============= 内容解析 =============
         function parseContent(html, baseUrl) {
             const results = [];
             const seen = new Set();
@@ -844,7 +904,9 @@
                 ? ['apk', 'image', 'video', 'audio'] 
                 : [state.crawlType];
 
-            // 正则提取
+            const base = new URL(baseUrl);
+
+            // 1. 正则提取
             for (const type of types) {
                 const rules = REGEX_RULES[type] || [];
                 for (const regex of rules) {
@@ -852,7 +914,7 @@
                     let match;
                     while ((match = regex.exec(html)) !== null) {
                         const url = match[0];
-                        if (!seen.has(url) && isValidUrl(url)) {
+                        if (!seen.has(url) && url.length < 2000) {
                             seen.add(url);
                             results.push(createResult(url, type, baseUrl));
                         }
@@ -860,40 +922,70 @@
                 }
             }
 
-            // DOM提取
+            // 2. DOM解析
             try {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const base = new URL(baseUrl);
 
-                // 提取链接
+                // 提取所有链接
                 doc.querySelectorAll('a[href]').forEach(a => {
                     const href = a.getAttribute('href');
-                    if (!href) return;
+                    if (!href || href.startsWith('javascript:')) return;
 
                     let fullUrl;
-                    try {
-                        fullUrl = new URL(href, base).href;
-                    } catch (e) {
-                        return;
-                    }
+                    try { fullUrl = new URL(href, base).href; }
+                    catch (e) { return; }
 
                     const type = detectType(fullUrl);
                     if (type && types.includes(type) && !seen.has(fullUrl)) {
                         seen.add(fullUrl);
-                        results.push(createResult(fullUrl, type, baseUrl, a.textContent.trim()));
+                        const name = a.textContent.trim() || fullUrl.split('/').pop().split('?')[0];
+                        results.push(createResult(fullUrl, type, baseUrl, name));
+                    }
+
+                    // 检查 onclick 属性里的URL
+                    const onclick = a.getAttribute('onclick');
+                    if (onclick) {
+                        const onclickMatch = onclick.match(/https?:\/\/[^\s"'<>]+/gi);
+                        if (onclickMatch) {
+                            onclickMatch.forEach(u => {
+                                const t = detectType(u);
+                                if (t && types.includes(t) && !seen.has(u) && u.length < 2000) {
+                                    seen.add(u);
+                                    results.push(createResult(u, t, baseUrl));
+                                }
+                            });
+                        }
                     }
                 });
 
-                // 图片特殊处理
-                if (types.includes('image')) {
-                    doc.querySelectorAll('img[src], img[data-src]').forEach(img => {
-                        const src = img.getAttribute('src') || img.getAttribute('data-src');
-                        if (!src || isIcon(src)) return;
+                // 提取 data-* 属性里的下载链接
+                for (const attr of DOWNLOAD_ATTR_PATTERNS) {
+                    doc.querySelectorAll(`[${attr}]`).forEach(el => {
+                        const val = el.getAttribute(attr);
+                        if (!val) return;
+                        
+                        let fullUrl;
+                        try { fullUrl = new URL(val, base).href; }
+                        catch (e) { return; }
+                        
+                        const type = detectType(fullUrl);
+                        if (type && types.includes(type) && !seen.has(fullUrl)) {
+                            seen.add(fullUrl);
+                            results.push(createResult(fullUrl, type, baseUrl));
+                        }
+                    });
+                }
 
+                // 图片
+                if (types.includes('image')) {
+                    doc.querySelectorAll('img[src], img[data-src], img[data-original]').forEach(img => {
+                        const src = img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('data-original');
+                        if (!src || isIconUrl(src)) return;
+                        
                         try {
                             const fullUrl = new URL(src, base).href;
-                            if (!seen.has(fullUrl)) {
+                            if (!seen.has(fullUrl) && fullUrl.length < 2000) {
                                 seen.add(fullUrl);
                                 results.push(createResult(fullUrl, 'image', baseUrl));
                             }
@@ -901,7 +993,7 @@
                     });
                 }
 
-                // video/source 标签
+                // 视频
                 if (types.includes('video')) {
                     doc.querySelectorAll('video[src], source[src]').forEach(el => {
                         const src = el.getAttribute('src');
@@ -916,7 +1008,7 @@
                     });
                 }
 
-                // audio 标签
+                // 音频
                 if (types.includes('audio')) {
                     doc.querySelectorAll('audio[src], source[src][type^="audio"]').forEach(el => {
                         const src = el.getAttribute('src');
@@ -930,60 +1022,82 @@
                         } catch (e) {}
                     });
                 }
+
+                // script标签里的资源URL
+                doc.querySelectorAll('script').forEach(script => {
+                    const content = script.textContent || '';
+                    for (const type of types) {
+                        const rules = REGEX_RULES[type] || [];
+                        for (const regex of rules) {
+                            regex.lastIndex = 0;
+                            let match;
+                            while ((match = regex.exec(content)) !== null) {
+                                const url = match[0];
+                                if (!seen.has(url) && url.length < 2000) {
+                                    seen.add(url);
+                                    results.push(createResult(url, type, baseUrl));
+                                }
+                            }
+                        }
+                    }
+                });
+
             } catch (e) {
-                console.error('DOM解析失败:', e);
+                console.warn('DOM解析失败:', e);
             }
 
             return results;
         }
 
-        // 创建结果对象
+        // 查找详情页链接
+        function findDetailLinks(html, baseUrl) {
+            const links = [];
+            const seen = new Set();
+            
+            try {
+                const base = new URL(baseUrl);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                doc.querySelectorAll('a[href]').forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+                    let fullUrl;
+                    try { fullUrl = new URL(href, base).href; }
+                    catch (e) { return; }
+
+                    // 只爬同域名
+                    try {
+                        if (new URL(fullUrl).hostname !== base.hostname) return;
+                    } catch (e) { return; }
+
+                    // 判断是否是详情页
+                    const isDetail = DETAIL_PAGE_PATTERNS.some(p => p.test(href) || p.test(fullUrl));
+                    if (isDetail && !seen.has(fullUrl)) {
+                        seen.add(fullUrl);
+                        links.push(fullUrl);
+                    }
+                });
+            } catch (e) {}
+
+            return links.slice(0, 10);
+        }
+
         function createResult(url, type, source, name = null) {
             const filename = url.split('/').pop().split('?')[0];
             return {
-                url,
-                type,
-                source,
+                url, type, source,
                 name: name || filename || '未命名',
                 filename,
                 ext: getExtension(url)
             };
         }
 
-        // 检测类型
-        function detectType(url) {
-            const lower = url.toLowerCase();
-            if (lower.includes('.apk')) return 'apk';
-            if (/\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?|$)/i.test(url)) return 'image';
-            if (/\.(mp4|mkv|avi|mov|wmv|flv|webm)(\?|$)/i.test(url)) return 'video';
-            if (/\.(mp3|flac|wav|aac|ogg|m4a|wma)(\?|$)/i.test(url)) return 'audio';
-            return null;
-        }
-
-        // 获取扩展名
-        function getExtension(url) {
-            const match = url.match(/\.(\w{2,4})(\?|$)/i);
-            return match ? match[1].toLowerCase() : '';
-        }
-
-        // 验证URL
-        function isValidUrl(url) {
-            return url.length > 10 && url.length < 2000 && !url.includes('data:image');
-        }
-
-        // 判断是否为图标
-        function isIcon(src) {
-            const lower = src.toLowerCase();
-            return lower.includes('icon') || lower.includes('emoji') || 
-                   lower.includes('loading') || lower.includes('spacer') ||
-                   lower.endsWith('.svg') || lower.includes('data:image');
-        }
-
-        // 应用过滤器
+        // ============= 过滤 =============
         function applyFilters() {
             const include = document.getElementById('includeFilter').value.trim().toLowerCase();
             const exclude = document.getElementById('excludeFilter').value.trim().toLowerCase();
-            const minSize = document.getElementById('minSizeFilter').value.trim();
 
             if (include) {
                 const keywords = include.split(',').map(k => k.trim()).filter(k => k);
@@ -998,24 +1112,28 @@
                     !keywords.some(k => r.name.toLowerCase().includes(k) || r.url.toLowerCase().includes(k))
                 );
             }
+
+            // 去重
+            const seen = new Set();
+            state.results = state.results.filter(r => {
+                if (seen.has(r.url)) return false;
+                seen.add(r.url);
+                return true;
+            });
         }
 
-        // 渲染结果
+        // ============= 渲染 =============
         function renderResults() {
             if (state.results.length === 0) {
                 document.getElementById('emptyState').style.display = 'block';
                 return;
             }
 
-            const icons = { apk: '📦', image: '🖼️', video: '🎬', audio: '🎵' };
-            const titles = { apk: 'APK应用', image: '图片', video: '视频', audio: '音频' };
-            const mainType = state.crawlType === 'all' ? 'all' : state.crawlType;
-
-            // 分类结果
             const images = state.results.filter(r => r.type === 'image');
             const others = state.results.filter(r => r.type !== 'image');
 
-            // 渲染列表
+            const icons = { apk: '📦', image: '🖼️', video: '🎬', audio: '🎵' };
+
             if (others.length > 0) {
                 document.getElementById('resultSection').style.display = 'block';
                 document.getElementById('resultIcon').textContent = '📋';
@@ -1028,7 +1146,7 @@
                         <div class="result-info">
                             <div class="result-name">${escapeHtml(r.name)}</div>
                             <div class="result-url">${escapeHtml(r.url)}</div>
-                            <div class="result-meta">${r.ext.toUpperCase()} · 来源: ${escapeHtml(r.source)}</div>
+                            <div class="result-meta">${r.ext.toUpperCase()} · ${escapeHtml(r.source.substring(0, 40))}</div>
                         </div>
                         <div class="result-actions">
                             <button class="btn-action btn-copy" onclick="copyUrl('${escapeHtml(r.url)}')">📋</button>
@@ -1039,14 +1157,13 @@
                 `).join('');
             }
 
-            // 渲染图片网格
             if (images.length > 0) {
                 document.getElementById('imageSection').style.display = 'block';
                 document.getElementById('imageCount').textContent = images.length;
 
                 document.getElementById('imageGrid').innerHTML = images.map(r => `
                     <div class="image-card">
-                        <img src="${escapeHtml(r.url)}" alt="图片" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖼️</text></svg>'">
+                        <img src="${escapeHtml(r.url)}" alt="图片" loading="lazy" onerror="this.parentElement.style.display='none'">
                         <div class="actions">
                             <button class="btn-action btn-copy" onclick="copyUrl('${escapeHtml(r.url)}')">📋</button>
                             <button class="btn-action btn-download" onclick="downloadFile('${escapeHtml(r.url)}', '${escapeHtml(r.filename)}')">⬇️</button>
@@ -1056,7 +1173,7 @@
             }
         }
 
-        // 复制单个URL
+        // ============= 操作 =============
         function copyUrl(url) {
             if (typeof FishApp !== 'undefined' && FishApp.copyToClipboard) {
                 FishApp.copyToClipboard(url);
@@ -1073,14 +1190,12 @@
             showToast('已复制到剪贴板');
         }
 
-        // 复制全部URL
         function copyAllUrls() {
             const urls = state.results.map(r => r.url).join('\n');
             copyUrl(urls);
             showToast('已复制 ' + state.results.length + ' 个链接');
         }
 
-        // 下载文件
         function downloadFile(url, name) {
             const filename = name || url.split('/').pop().split('?')[0] || 'download';
             
@@ -1089,7 +1204,7 @@
                 url,
                 name: filename,
                 progress: 0,
-                status: 'pending'
+                status: '等待下载'
             });
 
             if (typeof FishApp !== 'undefined') {
@@ -1107,7 +1222,6 @@
             showToast('开始下载: ' + filename);
         }
 
-        // 打开链接
         function openUrl(url) {
             if (typeof FishApp !== 'undefined') {
                 FishApp.openBrowser(url);
@@ -1116,7 +1230,6 @@
             }
         }
 
-        // 渲染下载列表
         function renderDownloads() {
             const list = document.getElementById('downloadList');
             document.getElementById('downloadCount').textContent = state.downloads.length;
@@ -1138,12 +1251,8 @@
             `).join('');
         }
 
-        // 导出结果
         function exportResults() {
-            if (state.results.length === 0) {
-                showToast('没有可导出的数据');
-                return;
-            }
+            if (state.results.length === 0) { showToast('没有可导出的数据'); return; }
 
             const csv = '名称,URL,类型,来源\n' + 
                 state.results.map(r => `"${r.name}","${r.url}","${r.type}","${r.source}"`).join('\n');
@@ -1155,11 +1264,9 @@
             a.download = `fish_export_${Date.now()}.csv`;
             a.click();
             URL.revokeObjectURL(url);
-
             showToast('导出成功');
         }
 
-        // 隐藏所有结果区域
         function hideAllResults() {
             document.getElementById('resultSection').style.display = 'none';
             document.getElementById('imageSection').style.display = 'none';
@@ -1167,14 +1274,7 @@
             document.getElementById('downloadPanel').style.display = 'none';
         }
 
-        // HTML转义
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // 回车键
+        // 回车
         document.getElementById('urlInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && state.mode !== 'batch') {
                 e.preventDefault();
