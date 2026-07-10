@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>鱼 - 网页爬虫</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            min-height: 100vh;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 16px 0;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1565C0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .header p {
+            color: #64B5F6;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 4px 20px rgba(21, 101, 192, 0.15);
+            margin-bottom: 12px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: #E3F2FD;
+            color: #1565C0;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            border: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .type-btn {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background: #F5F5F5;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            border: 2px solid transparent;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .type-btn.active {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border-color: #4CAF50;
+        }
+
+        .type-btn .icon {
+            margin-right: 4px;
+        }
+
+        .filter-box {
+            background: #F5F5F5;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .filter-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+            padding-top: 6px;
+            min-width: 60px;
+        }
+
+        .filter-input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #DDD;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .filter-input:focus {
+            border-color: #2196F3;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 2px solid #E3F2FD;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: monospace;
+        }
+
+        .url-input:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        }
+
+        .url-input.multiline {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            padding: 10px;
+            text-align: center;
+            color: #1565C0;
+            font-size: 13px;
+            display: none;
+        }
+
+        .status.active {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #E3F2FD;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2196F3, #4CAF50);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .result-section {
+            margin-top: 12px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1565C0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-count {
+            background: #2196F3;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-tiny {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-copy-all {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .btn-export {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .result-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .result-icon.apk { background: linear-gradient(135deg, #4CAF50, #388E3C); }
+        .result-icon.img { background: linear-gradient(135deg, #2196F3, #1976D2); }
+        .result-icon.video { background: linear-gradient(135deg, #FF5722, #E64A19); }
+        .result-icon.audio { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
+
+        .result-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .result-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            word-break: break-all;
+            margin-bottom: 2px;
+        }
+
+        .result-url {
+            font-size: 10px;
+            color: #999;
+            word-break: break-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .result-meta {
+            font-size: 9px;
+            color: #64B5F6;
+            margin-top: 2px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .btn-action {
+            padding: 6px 10px;
+            font-size: 11px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+        }
+
+        .btn-copy {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .btn-open {
+            background: #FFF8E1;
+            color: #F57C00;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+        }
+
+        .image-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .image-card img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-card .actions {
+            padding: 6px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 16px;
+            color: #90CAF9;
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .stats {
+            font-size: 11px;
+            color: #90CAF9;
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        .download-panel {
+            display: none;
+        }
+
+        .download-item {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-icon {
+            width: 36px;
+            height: 36px;
+            background: #E3F2FD;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .download-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .download-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .download-progress {
+            height: 4px;
+            background: #E3F2FD;
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .download-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2196F3, #4CAF50);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .download-status {
+            font-size: 10px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .batch-info {
+            font-size: 10px;
+            color: #FF9800;
+            background: #FFF8E1;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        .loading-dots span {
+            animation: pulse 1.4s infinite;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐟 鱼</h1>
+        <p>多类型资源爬虫 · 高速并发下载</p>
+    </div>
+
+    <div class="search-box">
+        <div class="tabs">
+            <button class="tab active" onclick="setMode('single')">单网址</button>
+            <button class="tab" onclick="setMode('batch')">批量爬取</button>
+            <button class="tab" onclick="toggleDownloads()">📥 下载</button>
+        </div>
+
+        <div class="type-selector">
+            <button class="type-btn active" data-type="apk" onclick="setCrawlType('apk')">
+                <span class="icon">📦</span>APK
+            </button>
+            <button class="type-btn" data-type="image" onclick="setCrawlType('image')">
+                <span class="icon">🖼️</span>图片
+            </button>
+            <button class="type-btn" data-type="video" onclick="setCrawlType('video')">
+                <span class="icon">🎬</span>视频
+            </button>
+            <button class="type-btn" data-type="audio" onclick="setCrawlType('audio')">
+                <span class="icon">🎵</span>音频
+            </button>
+            <button class="type-btn" data-type="all" onclick="setCrawlType('all')">
+                <span class="icon">📋</span>全部
+            </button>
+        </div>
+
+        <div class="filter-box" id="filterBox">
+            <div class="filter-row">
+                <span class="filter-label">包含:</span>
+                <input type="text" class="filter-input" id="includeFilter" placeholder="关键词1, 关键词2">
+            </div>
+            <div class="filter-row">
+                <span class="filter-label">排除:</span>
+                <input type="text" class="filter-input" id="excludeFilter" placeholder="关键词1, 关键词2">
+            </div>
+            <div class="filter-row">
+                <span class="filter-label">最小:</span>
+                <input type="text" class="filter-input" id="minSizeFilter" placeholder="最小文件大小，如: 1MB">
+            </div>
+        </div>
+
+        <div id="batchInfo" class="batch-info" style="display:none;">💡 每行一个网址，并发爬取</div>
+
+        <div class="input-group">
+            <input type="text" class="url-input" id="urlInput" placeholder="输入目标网址">
+            <button class="btn btn-primary" id="crawlBtn" onclick="startCrawl()">开始</button>
+        </div>
+
+        <div class="status" id="status">
+            <span class="loading-dots">正在爬取<span>.</span><span>.</span><span>.</span></span>
+            <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+        </div>
+        <div class="stats" id="stats"></div>
+    </div>
+
+    <div id="downloadPanel" class="download-panel result-section">
+        <div class="section-header">
+            <div class="section-title">
+                📥 下载管理 <span class="section-count" id="downloadCount">0</span>
+            </div>
+        </div>
+        <div id="downloadList"></div>
+    </div>
+
+    <div id="resultSection" class="result-section" style="display:none;">
+        <div class="section-header">
+            <div class="section-title">
+                <span id="resultIcon">📦</span>
+                <span id="resultTitle">结果</span>
+                <span class="section-count" id="resultCount">0</span>
+            </div>
+            <div class="section-actions">
+                <button class="btn-tiny btn-copy-all" onclick="copyAllUrls()">📋 复制全部</button>
+                <button class="btn-tiny btn-export" onclick="exportResults()">📤 导出</button>
+            </div>
+        </div>
+        <div class="result-grid" id="resultList"></div>
+    </div>
+
+    <div id="imageSection" class="result-section" style="display:none;">
+        <div class="section-header">
+            <div class="section-title">
+                🖼️ 图片预览 <span class="section-count" id="imageCount">0</span>
+            </div>
+            <div class="section-actions">
+                <button class="btn-tiny btn-copy-all" onclick="copyAllUrls()">📋 复制全部</button>
+            </div>
+        </div>
+        <div class="image-grid" id="imageGrid"></div>
+    </div>
+
+    <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="icon">🔍</div>
+        <p>未找到匹配的资源</p>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 配置
+        const CONFIG = {
+            PROXIES: [
+                'https://api.allorigins.win/raw?url=',
+                'https://corsproxy.io/?',
+                'https://api.codetabs.com/v1/proxy?quest='
+            ],
+            TIMEOUT: 10000,
+            MAX_CONCURRENT: 5,
+            CACHE_TTL: 60000,
+            USER_AGENT: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        };
+
+        // 正则规则
+        const REGEX_RULES = {
+            apk: [
+                /https?:\/\/[^\s"'<>]+\.apk([^\s"'<>]*)?/gi,
+                /https?:\/\/[^\s"'<>]*\/download\/[^\s"'<>]*\.apk/gi,
+                /https?:\/\/[^\s"'<>]*\/uploads?\/[^\s"'<>]*\.apk/gi
+            ],
+            image: [
+                /https?:\/\/[^\s"'<>]+\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?[^\s"'<>]*)?/gi,
+                /https?:\/\/[^\s"'<>]*\/uploads?\/[^\s"'<>]*\.(jpg|jpeg|png|gif|webp)/gi,
+                /https?:\/\/[^\s"'<>]*\/images?\/[^\s"'<>]*\.(jpg|jpeg|png|gif|webp)/gi
+            ],
+            video: [
+                /https?:\/\/[^\s"'<>]+\.(mp4|mkv|avi|mov|wmv|flv|webm)(\?[^\s"'<>]*)?/gi,
+                /https?:\/\/[^\s"'<>]*\/videos?\/[^\s"'<>]*\.(mp4|mkv|avi|mov|webm)/gi,
+                /https?:\/\/[^\s"'<>]*\/download\/[^\s"'<>]*\.(mp4|mkv|avi|mov|webm)/gi
+            ],
+            audio: [
+                /https?:\/\/[^\s"'<>]+\.(mp3|flac|wav|aac|ogg|m4a|wma)(\?[^\s"'<>]*)?/gi,
+                /https?:\/\/[^\s"'<>]*\/audio\/[^\s"'<>]*\.(mp3|flac|wav|aac|ogg|m4a)/gi,
+                /https?:\/\/[^\s"'<>]*\/music\/[^\s"'<>]*\.(mp3|flac|wav|aac|ogg|m4a)/gi
+            ]
+        };
+
+        // 状态
+        let state = {
+            mode: 'single',
+            crawlType: 'apk',
+            results: [],
+            cache: {},
+            downloads: [],
+            abortController: null
+        };
+
+        // 设置爬取模式
+        function setMode(mode) {
+            state.mode = mode;
+            document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const input = document.getElementById('urlInput');
+            const batchInfo = document.getElementById('batchInfo');
+            
+            if (mode === 'batch') {
+                input.classList.add('multiline');
+                input.placeholder = '每行一个网址\nhttps://example1.com\nhttps://example2.com';
+                batchInfo.style.display = 'inline-block';
+            } else {
+                input.classList.remove('multiline');
+                input.placeholder = '输入目标网址';
+                batchInfo.style.display = 'none';
+            }
+        }
+
+        // 设置爬取类型
+        function setCrawlType(type) {
+            state.crawlType = type;
+            document.querySelectorAll('.type-btn').forEach(t => t.classList.remove('active'));
+            event.target.closest('.type-btn').classList.add('active');
+        }
+
+        // 显示提示
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // 切换下载面板
+        function toggleDownloads() {
+            const panel = document.getElementById('downloadPanel');
+            const resultSection = document.getElementById('resultSection');
+            const imageSection = document.getElementById('imageSection');
+            
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                resultSection.style.display = state.results.length > 0 ? 'block' : 'none';
+                imageSection.style.display = state.results.some(r => r.type === 'image') ? 'block' : 'none';
+            } else {
+                panel.style.display = 'block';
+                resultSection.style.display = 'none';
+                imageSection.style.display = 'none';
+                renderDownloads();
+            }
+        }
+
+        // 开始爬取
+        async function startCrawl() {
+            const input = document.getElementById('urlInput').value.trim();
+            if (!input) {
+                showToast('请输入网址');
+                return;
+            }
+
+            const urls = state.mode === 'batch' 
+                ? input.split('\n').map(u => normalizeUrl(u.trim())).filter(u => u)
+                : [normalizeUrl(input)].filter(u => u);
+
+            if (urls.length === 0) {
+                showToast('请输入有效的网址');
+                return;
+            }
+
+            // 初始化
+            state.results = [];
+            state.abortController = new AbortController();
+            
+            document.getElementById('crawlBtn').disabled = true;
+            document.getElementById('status').classList.add('active');
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('stats').textContent = '';
+            
+            hideAllResults();
+
+            const startTime = Date.now();
+            let completed = 0;
+
+            try {
+                // 并发爬取
+                const batchSize = Math.min(urls.length, CONFIG.MAX_CONCURRENT);
+                const batches = [];
+                
+                for (let i = 0; i < urls.length; i += batchSize) {
+                    batches.push(urls.slice(i, i + batchSize));
+                }
+
+                for (let batch of batches) {
+                    const promises = batch.map(url => crawlUrl(url));
+                    await Promise.allSettled(promises);
+                    
+                    completed += batch.length;
+                    const progress = Math.round((completed / urls.length) * 100);
+                    document.getElementById('progressBar').style.width = progress + '%';
+                    document.getElementById('status').innerHTML = 
+                        `<span class="loading-dots">正在爬取 ${completed}/${urls.length}<span>.</span><span>.</span><span>.</span></span>
+                        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>`;
+                }
+
+                applyFilters();
+                renderResults();
+                
+                const elapsed = Date.now() - startTime;
+                document.getElementById('stats').textContent = 
+                    `完成！共 ${urls.length} 个网址，找到 ${state.results.length} 个资源，耗时 ${elapsed}ms`;
+            } catch (error) {
+                console.error('爬取失败:', error);
+                showToast('爬取失败: ' + error.message);
+            } finally {
+                document.getElementById('status').classList.remove('active');
+                document.getElementById('crawlBtn').disabled = false;
+            }
+        }
+
+        // 标准化URL
+        function normalizeUrl(url) {
+            if (!url) return null;
+            try {
+                return new URL(url).href;
+            } catch (e) {
+                try {
+                    return new URL('https://' + url).href;
+                } catch (e2) {
+                    return null;
+                }
+            }
+        }
+
+        // 爬取单个URL
+        async function crawlUrl(url) {
+            // 检查缓存
+            if (state.cache[url] && Date.now() - state.cache[url].time < CONFIG.CACHE_TTL) {
+                state.results.push(...state.cache[url].results);
+                return;
+            }
+
+            const html = await fetchWithProxy(url);
+            if (!html) throw new Error('无法获取内容');
+
+            const results = parseContent(html, url);
+            
+            // 缓存
+            state.cache[url] = {
+                time: Date.now(),
+                results: results
+            };
+
+            state.results.push(...results);
+        }
+
+        // 并发代理请求（返回最快的）
+        async function fetchWithProxy(url) {
+            const { signal } = state.abortController;
+            
+            const promises = CONFIG.PROXIES.map(proxy => 
+                fetch(proxy + encodeURIComponent(url), {
+                    method: 'GET',
+                    signal,
+                    headers: {
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+                    }
+                })
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.text();
+                })
+                .catch(() => null)
+            );
+
+            // 返回第一个成功的结果
+            const results = await Promise.all(promises);
+            return results.find(r => r !== null) || null;
+        }
+
+        // 解析内容
+        function parseContent(html, baseUrl) {
+            const results = [];
+            const seen = new Set();
+            const types = state.crawlType === 'all' 
+                ? ['apk', 'image', 'video', 'audio'] 
+                : [state.crawlType];
+
+            // 正则提取
+            for (const type of types) {
+                const rules = REGEX_RULES[type] || [];
+                for (const regex of rules) {
+                    regex.lastIndex = 0;
+                    let match;
+                    while ((match = regex.exec(html)) !== null) {
+                        const url = match[0];
+                        if (!seen.has(url) && isValidUrl(url)) {
+                            seen.add(url);
+                            results.push(createResult(url, type, baseUrl));
+                        }
+                    }
+                }
+            }
+
+            // DOM提取
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const base = new URL(baseUrl);
+
+                // 提取链接
+                doc.querySelectorAll('a[href]').forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (!href) return;
+
+                    let fullUrl;
+                    try {
+                        fullUrl = new URL(href, base).href;
+                    } catch (e) {
+                        return;
+                    }
+
+                    const type = detectType(fullUrl);
+                    if (type && types.includes(type) && !seen.has(fullUrl)) {
+                        seen.add(fullUrl);
+                        results.push(createResult(fullUrl, type, baseUrl, a.textContent.trim()));
+                    }
+                });
+
+                // 图片特殊处理
+                if (types.includes('image')) {
+                    doc.querySelectorAll('img[src], img[data-src]').forEach(img => {
+                        const src = img.getAttribute('src') || img.getAttribute('data-src');
+                        if (!src || isIcon(src)) return;
+
+                        try {
+                            const fullUrl = new URL(src, base).href;
+                            if (!seen.has(fullUrl)) {
+                                seen.add(fullUrl);
+                                results.push(createResult(fullUrl, 'image', baseUrl));
+                            }
+                        } catch (e) {}
+                    });
+                }
+
+                // video/source 标签
+                if (types.includes('video')) {
+                    doc.querySelectorAll('video[src], source[src]').forEach(el => {
+                        const src = el.getAttribute('src');
+                        if (!src) return;
+                        try {
+                            const fullUrl = new URL(src, base).href;
+                            if (!seen.has(fullUrl)) {
+                                seen.add(fullUrl);
+                                results.push(createResult(fullUrl, 'video', baseUrl));
+                            }
+                        } catch (e) {}
+                    });
+                }
+
+                // audio 标签
+                if (types.includes('audio')) {
+                    doc.querySelectorAll('audio[src], source[src][type^="audio"]').forEach(el => {
+                        const src = el.getAttribute('src');
+                        if (!src) return;
+                        try {
+                            const fullUrl = new URL(src, base).href;
+                            if (!seen.has(fullUrl)) {
+                                seen.add(fullUrl);
+                                results.push(createResult(fullUrl, 'audio', baseUrl));
+                            }
+                        } catch (e) {}
+                    });
+                }
+            } catch (e) {
+                console.error('DOM解析失败:', e);
+            }
+
+            return results;
+        }
+
+        // 创建结果对象
+        function createResult(url, type, source, name = null) {
+            const filename = url.split('/').pop().split('?')[0];
+            return {
+                url,
+                type,
+                source,
+                name: name || filename || '未命名',
+                filename,
+                ext: getExtension(url)
+            };
+        }
+
+        // 检测类型
+        function detectType(url) {
+            const lower = url.toLowerCase();
+            if (lower.includes('.apk')) return 'apk';
+            if (/\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?|$)/i.test(url)) return 'image';
+            if (/\.(mp4|mkv|avi|mov|wmv|flv|webm)(\?|$)/i.test(url)) return 'video';
+            if (/\.(mp3|flac|wav|aac|ogg|m4a|wma)(\?|$)/i.test(url)) return 'audio';
+            return null;
+        }
+
+        // 获取扩展名
+        function getExtension(url) {
+            const match = url.match(/\.(\w{2,4})(\?|$)/i);
+            return match ? match[1].toLowerCase() : '';
+        }
+
+        // 验证URL
+        function isValidUrl(url) {
+            return url.length > 10 && url.length < 2000 && !url.includes('data:image');
+        }
+
+        // 判断是否为图标
+        function isIcon(src) {
+            const lower = src.toLowerCase();
+            return lower.includes('icon') || lower.includes('emoji') || 
+                   lower.includes('loading') || lower.includes('spacer') ||
+                   lower.endsWith('.svg') || lower.includes('data:image');
+        }
+
+        // 应用过滤器
+        function applyFilters() {
+            const include = document.getElementById('includeFilter').value.trim().toLowerCase();
+            const exclude = document.getElementById('excludeFilter').value.trim().toLowerCase();
+            const minSize = document.getElementById('minSizeFilter').value.trim();
+
+            if (include) {
+                const keywords = include.split(',').map(k => k.trim()).filter(k => k);
+                state.results = state.results.filter(r => 
+                    keywords.some(k => r.name.toLowerCase().includes(k) || r.url.toLowerCase().includes(k))
+                );
+            }
+
+            if (exclude) {
+                const keywords = exclude.split(',').map(k => k.trim()).filter(k => k);
+                state.results = state.results.filter(r => 
+                    !keywords.some(k => r.name.toLowerCase().includes(k) || r.url.toLowerCase().includes(k))
+                );
+            }
+        }
+
+        // 渲染结果
+        function renderResults() {
+            if (state.results.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            const icons = { apk: '📦', image: '🖼️', video: '🎬', audio: '🎵' };
+            const titles = { apk: 'APK应用', image: '图片', video: '视频', audio: '音频' };
+            const mainType = state.crawlType === 'all' ? 'all' : state.crawlType;
+
+            // 分类结果
+            const images = state.results.filter(r => r.type === 'image');
+            const others = state.results.filter(r => r.type !== 'image');
+
+            // 渲染列表
+            if (others.length > 0) {
+                document.getElementById('resultSection').style.display = 'block';
+                document.getElementById('resultIcon').textContent = '📋';
+                document.getElementById('resultTitle').textContent = '资源列表';
+                document.getElementById('resultCount').textContent = state.results.length;
+
+                document.getElementById('resultList').innerHTML = others.map(r => `
+                    <div class="result-card">
+                        <div class="result-icon ${r.type}">${icons[r.type] || '📄'}</div>
+                        <div class="result-info">
+                            <div class="result-name">${escapeHtml(r.name)}</div>
+                            <div class="result-url">${escapeHtml(r.url)}</div>
+                            <div class="result-meta">${r.ext.toUpperCase()} · 来源: ${escapeHtml(r.source)}</div>
+                        </div>
+                        <div class="result-actions">
+                            <button class="btn-action btn-copy" onclick="copyUrl('${escapeHtml(r.url)}')">📋</button>
+                            <button class="btn-action btn-download" onclick="downloadFile('${escapeHtml(r.url)}', '${escapeHtml(r.filename)}')">⬇️</button>
+                            <button class="btn-action btn-open" onclick="openUrl('${escapeHtml(r.url)}')">🔗</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // 渲染图片网格
+            if (images.length > 0) {
+                document.getElementById('imageSection').style.display = 'block';
+                document.getElementById('imageCount').textContent = images.length;
+
+                document.getElementById('imageGrid').innerHTML = images.map(r => `
+                    <div class="image-card">
+                        <img src="${escapeHtml(r.url)}" alt="图片" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖼️</text></svg>'">
+                        <div class="actions">
+                            <button class="btn-action btn-copy" onclick="copyUrl('${escapeHtml(r.url)}')">📋</button>
+                            <button class="btn-action btn-download" onclick="downloadFile('${escapeHtml(r.url)}', '${escapeHtml(r.filename)}')">⬇️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // 复制单个URL
+        function copyUrl(url) {
+            if (typeof FishApp !== 'undefined' && FishApp.copyToClipboard) {
+                FishApp.copyToClipboard(url);
+            } else {
+                navigator.clipboard.writeText(url).catch(() => {
+                    const input = document.createElement('input');
+                    input.value = url;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                });
+            }
+            showToast('已复制到剪贴板');
+        }
+
+        // 复制全部URL
+        function copyAllUrls() {
+            const urls = state.results.map(r => r.url).join('\n');
+            copyUrl(urls);
+            showToast('已复制 ' + state.results.length + ' 个链接');
+        }
+
+        // 下载文件
+        function downloadFile(url, name) {
+            const filename = name || url.split('/').pop().split('?')[0] || 'download';
+            
+            state.downloads.push({
+                id: Date.now(),
+                url,
+                name: filename,
+                progress: 0,
+                status: 'pending'
+            });
+
+            if (typeof FishApp !== 'undefined') {
+                FishApp.downloadFile(url, filename);
+            } else {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+
+            showToast('开始下载: ' + filename);
+        }
+
+        // 打开链接
+        function openUrl(url) {
+            if (typeof FishApp !== 'undefined') {
+                FishApp.openBrowser(url);
+            } else {
+                window.open(url, '_blank');
+            }
+        }
+
+        // 渲染下载列表
+        function renderDownloads() {
+            const list = document.getElementById('downloadList');
+            document.getElementById('downloadCount').textContent = state.downloads.length;
+            
+            if (state.downloads.length === 0) {
+                list.innerHTML = '<div class="empty-state" style="padding:16px;"><div class="icon" style="font-size:28px;">📥</div><p>暂无下载</p></div>';
+                return;
+            }
+
+            list.innerHTML = state.downloads.map(d => `
+                <div class="download-item">
+                    <div class="download-icon">${d.name.endsWith('.apk') ? '📦' : d.name.match(/\.(jpg|png|gif|webp)$/i) ? '🖼️' : '📄'}</div>
+                    <div class="download-info">
+                        <div class="download-name">${escapeHtml(d.name)}</div>
+                        <div class="download-progress"><div class="download-bar" style="width:${d.progress}%"></div></div>
+                        <div class="download-status">${d.status}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 导出结果
+        function exportResults() {
+            if (state.results.length === 0) {
+                showToast('没有可导出的数据');
+                return;
+            }
+
+            const csv = '名称,URL,类型,来源\n' + 
+                state.results.map(r => `"${r.name}","${r.url}","${r.type}","${r.source}"`).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fish_export_${Date.now()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('导出成功');
+        }
+
+        // 隐藏所有结果区域
+        function hideAllResults() {
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('imageSection').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('downloadPanel').style.display = 'none';
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 回车键
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && state.mode !== 'batch') {
+                e.preventDefault();
+                startCrawl();
+            }
+        });
+    </script>
+</body>
+</html>

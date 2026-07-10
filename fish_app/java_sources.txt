@@ -1,0 +1,2 @@
+gen/com/fish/crawler/R.java
+src/com/fish/crawler/MainActivity.java
