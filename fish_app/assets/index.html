@@ -480,25 +480,25 @@
 
     <div class="search-box">
         <div class="tabs">
-            <button class="tab active" onclick="setMode('single')">单网址</button>
-            <button class="tab" onclick="setMode('batch')">批量爬取</button>
-            <button class="tab" onclick="toggleDownloads()">📥 下载</button>
+            <button class="tab active" data-mode="single">单网址</button>
+            <button class="tab" data-mode="batch">批量爬取</button>
+            <button class="tab" data-mode="downloads">📥 下载</button>
         </div>
 
         <div class="type-selector">
-            <button class="type-btn active" data-type="apk" onclick="setCrawlType('apk')">
+            <button class="type-btn active" data-type="apk">
                 <span>📦</span>APK
             </button>
-            <button class="type-btn" data-type="image" onclick="setCrawlType('image')">
+            <button class="type-btn" data-type="image">
                 <span>🖼️</span>图片
             </button>
-            <button class="type-btn" data-type="video" onclick="setCrawlType('video')">
+            <button class="type-btn" data-type="video">
                 <span>🎬</span>视频
             </button>
-            <button class="type-btn" data-type="audio" onclick="setCrawlType('audio')">
+            <button class="type-btn" data-type="audio">
                 <span>🎵</span>音频
             </button>
-            <button class="type-btn" data-type="all" onclick="setCrawlType('all')">
+            <button class="type-btn" data-type="all">
                 <span>📋</span>全部
             </button>
         </div>
@@ -668,9 +668,14 @@
 
         function normalizeUrl(url) {
             if (!url) return null;
+            url = url.trim();
             try {
                 return new URL(url).href;
             } catch (e) {
+                if (url.startsWith('//')) {
+                    try { return new URL('https:' + url).href; }
+                    catch (e2) { return null; }
+                }
                 try { return new URL('https://' + url).href; }
                 catch (e2) { return null; }
             }
@@ -699,10 +704,27 @@
         }
 
         // ============= 模式切换 =============
-        function setMode(mode) {
+        document.querySelector('.tabs').addEventListener('click', function(e) {
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+            const mode = tab.dataset.mode;
+            if (mode === 'downloads') {
+                toggleDownloads();
+            } else {
+                setMode(mode, tab);
+            }
+        });
+
+        document.querySelector('.type-selector').addEventListener('click', function(e) {
+            const btn = e.target.closest('.type-btn');
+            if (!btn) return;
+            setCrawlType(btn.dataset.type, btn);
+        });
+
+        function setMode(mode, el) {
             state.mode = mode;
             document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            el.classList.add('active');
             
             const input = document.getElementById('urlInput');
             const batchInfo = document.getElementById('batchInfo');
@@ -718,10 +740,10 @@
             }
         }
 
-        function setCrawlType(type) {
+        function setCrawlType(type, el) {
             state.crawlType = type;
             document.querySelectorAll('.type-btn').forEach(t => t.classList.remove('active'));
-            event.target.closest('.type-btn').classList.add('active');
+            el.classList.add('active');
         }
 
         function toggleDownloads() {
@@ -760,6 +782,7 @@
             state.results = [];
             state.seenUrls = new Set();
             state.deepLinks = new Set();
+            state.taskQueue = [];
             
             document.getElementById('crawlBtn').disabled = true;
             document.getElementById('status').classList.add('active');
@@ -773,21 +796,19 @@
             const maxDepth = parseInt(document.getElementById('maxDepth').value) || 2;
             const startTime = Date.now();
             let completed = 0;
-            const totalTasks = [];
 
             // 第一层：爬取输入的URLs
             for (const url of urls) {
-                totalTasks.push({ url, depth: 1 });
+                state.taskQueue.push({ url, depth: 1 });
             }
 
             log(`开始爬取 ${urls.length} 个网址，深度爬取: ${deepCrawl ? '开启' : '关闭'}`);
 
             // 广度优先爬取
-            let taskQueue = [...totalTasks];
             let processed = 0;
 
-            while (taskQueue.length > 0 && processed < 50) {
-                const batch = taskQueue.splice(0, CONFIG.MAX_CONCURRENT);
+            while (state.taskQueue.length > 0 && processed < 50) {
+                const batch = state.taskQueue.splice(0, CONFIG.MAX_CONCURRENT);
                 
                 const promises = batch.map(task => crawlPage(task.url, task.depth, deepCrawl, maxDepth));
                 await Promise.allSettled(promises);
@@ -795,7 +816,8 @@
                 processed += batch.length;
                 completed += batch.length;
                 
-                const progress = Math.min(100, Math.round((processed / Math.max(processed + taskQueue.length, 1)) * 100));
+                const total = processed + state.taskQueue.length;
+                const progress = total > 0 ? Math.min(100, Math.round((processed / total) * 100)) : 100;
                 document.getElementById('progressBar').style.width = progress + '%';
                 document.getElementById('status').innerHTML = 
                     `<span class="loading-dots">爬取中 ${processed} 页，找到 ${state.results.length} 个资源<span>.</span><span>.</span><span>.</span></span>
@@ -847,8 +869,7 @@
                     for (const link of detailLinks) {
                         if (!state.seenUrls.has(link) && state.deepLinks.size < CONFIG.MAX_DEEP_LINKS) {
                             state.deepLinks.add(link);
-                            // 延迟递归爬取
-                            setTimeout(() => crawlPage(link, depth + 1, deepCrawl, maxDepth), 0);
+                            state.taskQueue.push({ url: link, depth: depth + 1 });
                         }
                     }
                 }
@@ -861,6 +882,7 @@
         async function fetchWithProxy(url) {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
+            let resolved = false;
 
             // 所有代理并发请求，返回第一个成功的
             const promises = CONFIG.PROXIES.map(proxy =>
@@ -877,6 +899,11 @@
                     if (!r.ok) throw new Error('HTTP ' + r.status);
                     const text = await r.text();
                     if (text && text.length > 100 && !text.includes('error code:') && !text.includes('Server-side requests')) {
+                        if (!resolved) {
+                            resolved = true;
+                            clearTimeout(timeout);
+                            controller.abort();
+                        }
                         return text;
                     }
                     throw new Error('invalid response');
@@ -1138,7 +1165,7 @@
                 document.getElementById('resultSection').style.display = 'block';
                 document.getElementById('resultIcon').textContent = '📋';
                 document.getElementById('resultTitle').textContent = '资源列表';
-                document.getElementById('resultCount').textContent = state.results.length;
+                document.getElementById('resultCount').textContent = others.length;
 
                 document.getElementById('resultList').innerHTML = others.map(r => `
                     <div class="result-card">
@@ -1149,9 +1176,9 @@
                             <div class="result-meta">${r.ext.toUpperCase()} · ${escapeHtml(r.source.substring(0, 40))}</div>
                         </div>
                         <div class="result-actions">
-                            <button class="btn-action btn-copy" onclick="copyUrl('${escapeHtml(r.url)}')">📋</button>
-                            <button class="btn-action btn-download" onclick="downloadFile('${escapeHtml(r.url)}', '${escapeHtml(r.filename)}')">⬇️</button>
-                            <button class="btn-action btn-open" onclick="openUrl('${escapeHtml(r.url)}')">🔗</button>
+                            <button class="btn-action btn-copy" data-url="${encodeURIComponent(r.url)}">📋</button>
+                            <button class="btn-action btn-download" data-url="${encodeURIComponent(r.url)}" data-name="${encodeURIComponent(r.filename)}">⬇️</button>
+                            <button class="btn-action btn-open" data-url="${encodeURIComponent(r.url)}">🔗</button>
                         </div>
                     </div>
                 `).join('');
@@ -1165,8 +1192,8 @@
                     <div class="image-card">
                         <img src="${escapeHtml(r.url)}" alt="图片" loading="lazy" onerror="this.parentElement.style.display='none'">
                         <div class="actions">
-                            <button class="btn-action btn-copy" onclick="copyUrl('${escapeHtml(r.url)}')">📋</button>
-                            <button class="btn-action btn-download" onclick="downloadFile('${escapeHtml(r.url)}', '${escapeHtml(r.filename)}')">⬇️</button>
+                            <button class="btn-action btn-copy" data-url="${encodeURIComponent(r.url)}">📋</button>
+                            <button class="btn-action btn-download" data-url="${encodeURIComponent(r.url)}" data-name="${encodeURIComponent(r.filename)}">⬇️</button>
                         </div>
                     </div>
                 `).join('');
@@ -1174,6 +1201,23 @@
         }
 
         // ============= 操作 =============
+        document.getElementById('resultList').addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-action');
+            if (!btn) return;
+            const url = decodeURIComponent(btn.dataset.url);
+            if (btn.classList.contains('btn-copy')) copyUrl(url);
+            else if (btn.classList.contains('btn-download')) downloadFile(url, decodeURIComponent(btn.dataset.name || ''));
+            else if (btn.classList.contains('btn-open')) openUrl(url);
+        });
+
+        document.getElementById('imageGrid').addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-action');
+            if (!btn) return;
+            const url = decodeURIComponent(btn.dataset.url);
+            if (btn.classList.contains('btn-copy')) copyUrl(url);
+            else if (btn.classList.contains('btn-download')) downloadFile(url, decodeURIComponent(btn.dataset.name || ''));
+        });
+
         function copyUrl(url) {
             if (typeof FishApp !== 'undefined' && FishApp.copyToClipboard) {
                 FishApp.copyToClipboard(url);
@@ -1254,8 +1298,8 @@
         function exportResults() {
             if (state.results.length === 0) { showToast('没有可导出的数据'); return; }
 
-            const csv = '名称,URL,类型,来源\n' + 
-                state.results.map(r => `"${r.name}","${r.url}","${r.type}","${r.source}"`).join('\n');
+            const csv = '\uFEFF名称,URL,类型,来源\n' + 
+                state.results.map(r => `"${(r.name || '').replace(/"/g, '""')}","${r.url}","${r.type}","${r.source}"`).join('\n');
             
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
             const url = URL.createObjectURL(blob);
@@ -1275,7 +1319,7 @@
         }
 
         // 回车
-        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+        document.getElementById('urlInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && state.mode !== 'batch') {
                 e.preventDefault();
                 startCrawl();

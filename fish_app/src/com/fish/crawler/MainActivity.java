@@ -2,6 +2,9 @@ package com.fish.crawler;
 
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -82,12 +85,48 @@ public class MainActivity extends Activity {
 
     @JavascriptInterface
     public void downloadFile(final String url, final String filename) {
+        if (!isValidHttpUrl(url)) {
+            handler.post(new ToastRunnable(this, "无效的下载链接"));
+            return;
+        }
         handler.post(new DownloadRunnable(this, url, filename));
     }
 
     @JavascriptInterface
     public void openBrowser(final String url) {
+        if (!isValidHttpUrl(url)) {
+            handler.post(new ToastRunnable(this, "无效的链接"));
+            return;
+        }
         handler.post(new OpenUrlRunnable(this, url));
+    }
+
+    @JavascriptInterface
+    public void copyToClipboard(final String text) {
+        handler.post(() -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null) {
+                clipboard.setPrimaryClip(ClipData.newPlainText("url", text));
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (webView != null) {
+            webView.stopLoading();
+            webView.loadUrl("about:blank");
+            webView.removeAllViews();
+            webView.destroy();
+            webView = null;
+        }
+        super.onDestroy();
+    }
+
+    private static boolean isValidHttpUrl(String url) {
+        if (url == null || url.isEmpty()) return false;
+        String lower = url.toLowerCase();
+        return lower.startsWith("http://") || lower.startsWith("https://");
     }
 
     // Helper class for showing toast
