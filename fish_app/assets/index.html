@@ -475,7 +475,7 @@
 <body>
     <div class="header">
         <h1>🐟 鱼</h1>
-        <p>多类型资源爬虫 · 深度爬取 · 高速并发</p>
+        <p>多类型资源爬虫 · 高速并发下载</p>
     </div>
 
     <div class="search-box">
@@ -492,6 +492,9 @@
             <button class="type-btn" data-type="image" onclick="setCrawlType('image')">
                 <span>🖼️</span>图片
             </button>
+            <button class="type-btn" data-type="hdimage" onclick="setCrawlType('hdimage')">
+                <span>🌆</span>高清壁纸
+            </button>
             <button class="type-btn" data-type="video" onclick="setCrawlType('video')">
                 <span>🎬</span>视频
             </button>
@@ -506,26 +509,22 @@
         <div class="options-box">
             <div class="option-row">
                 <span class="option-label">包含:</span>
-                <input type="text" class="option-input" id="includeFilter" placeholder="关键词">
-                <span class="option-label">排除:</span>
-                <input type="text" class="option-input" id="excludeFilter" placeholder="关键词">
+                <input type="text" class="option-input" id="includeFilter" placeholder="关键词1, 关键词2">
             </div>
             <div class="option-row">
-                <label class="checkbox-item">
-                    <input type="checkbox" id="deepCrawl" checked> 深度爬取（进详情页）
-                </label>
-                <label class="checkbox-item">
-                    <input type="checkbox" id="showLog"> 显示日志
-                </label>
-                <span class="option-label">深度:</span>
-                <input type="number" class="option-input" id="maxDepth" value="2" style="width:50px;min-width:40px">
+                <span class="option-label">排除:</span>
+                <input type="text" class="option-input" id="excludeFilter" placeholder="关键词1, 关键词2">
+            </div>
+            <div class="option-row">
+                <span class="option-label">最小:</span>
+                <input type="text" class="option-input" id="minSizeFilter" placeholder="最小文件大小，如：1MB">
             </div>
         </div>
 
         <div id="batchInfo" class="batch-info" style="display:none;">💡 每行一个网址，并发爬取</div>
 
         <div class="input-group">
-            <input type="text" class="url-input" id="urlInput" placeholder="输入目标网址，如：m.onlinedown.net">
+            <input type="text" class="url-input" id="urlInput" placeholder="输入目标网址">
             <button class="btn btn-primary" id="crawlBtn" onclick="startCrawl()">开始</button>
         </div>
 
@@ -646,6 +645,9 @@
             ],
             image: [
                 /https?:\/\/[^\s"'<>()]+?\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?[^\s"'<>()]*)?/gi,
+            ],
+            hdimage: [
+                /https?:\/\/[^\s"'<>()]+?\.(jpg|jpeg|png|webp|avif)(\?[^\s"'<>()]*)?/gi,
             ],
             video: [
                 /https?:\/\/[^\s"'<>()]+?\.(mp4|mkv|avi|mov|wmv|flv|webm|m3u8)(\?[^\s"'<>()]*)?/gi,
@@ -968,6 +970,8 @@
             const seen = new Set();
             const types = state.crawlType === 'all' 
                 ? ['apk', 'image', 'video', 'audio'] 
+                : state.crawlType === 'hdimage'
+                ? ['hdimage']
                 : [state.crawlType];
 
             const base = new URL(baseUrl);
@@ -1202,14 +1206,37 @@
                 url, type, source,
                 name: name || filename || '未命名',
                 filename,
-                ext: getExtension(url)
+                ext: getExtension(url),
+                size: getUrlSize(url)
             };
+        }
+
+        function getUrlSize(url) {
+            const match = url.match(/[_-](\d+)x(\d+)/i);
+            if (match) {
+                return parseInt(match[1]) * parseInt(match[2]);
+            }
+            return 0;
+        }
+
+        function parseMinSize(str) {
+            if (!str) return 0;
+            const match = str.match(/^(\d+(?:\.\d+)?)\s*(KB|MB|GB)?$/i);
+            if (!match) return 0;
+            const value = parseFloat(match[1]);
+            const unit = (match[2] || 'KB').toUpperCase();
+            const multipliers = { KB: 1024, MB: 1024*1024, GB: 1024*1024*1024 };
+            return value * multipliers[unit];
         }
 
         // ============= 过滤 =============
         function applyFilters() {
             const include = document.getElementById('includeFilter').value.trim().toLowerCase();
             const exclude = document.getElementById('excludeFilter').value.trim().toLowerCase();
+            const minSizeStr = document.getElementById('minSizeFilter') ? document.getElementById('minSizeFilter').value.trim() : '';
+            const minSize = parseMinSize(minSizeStr);
+            const isHdImage = state.crawlType === 'hdimage';
+            const minPixels = isHdImage ? 1920 * 1080 : 0;
 
             if (include) {
                 const keywords = include.split(',').map(k => k.trim()).filter(k => k);
@@ -1223,6 +1250,21 @@
                 state.results = state.results.filter(r => 
                     !keywords.some(k => r.name.toLowerCase().includes(k) || r.url.toLowerCase().includes(k))
                 );
+            }
+
+            if (minSize > 0) {
+                state.results = state.results.filter(r => r.size >= minSize);
+            }
+
+            if (isHdImage) {
+                state.results = state.results.filter(r => {
+                    if (r.size > 0) return r.size >= minPixels;
+                    return true;
+                });
+            }
+
+            if (isHdImage) {
+                state.results = state.results.map(r => ({ ...r, type: 'image' }));
             }
 
             // 去重
