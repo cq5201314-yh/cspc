@@ -130,17 +130,6 @@
 
         .option-input:focus { border-color: #2196F3; }
 
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 11px;
-            color: #555;
-            cursor: pointer;
-        }
-
-        .checkbox-item input { cursor: pointer; }
-
         .input-group {
             display: flex;
             gap: 6px;
@@ -758,7 +747,9 @@
         function setMode(mode) {
             state.mode = mode;
             document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            if (window.event && window.event.target) {
+                window.event.target.classList.add('active');
+            }
             
             const input = document.getElementById('urlInput');
             const batchInfo = document.getElementById('batchInfo');
@@ -777,7 +768,9 @@
         function setCrawlType(type) {
             state.crawlType = type;
             document.querySelectorAll('.type-btn').forEach(t => t.classList.remove('active'));
-            event.target.closest('.type-btn').classList.add('active');
+            if (window.event && window.event.target) {
+                window.event.target.closest('.type-btn').classList.add('active');
+            }
         }
 
         function toggleDownloads() {
@@ -797,9 +790,7 @@
             }
         }
 
-        document.getElementById('showLog').addEventListener('change', function() {
-            document.getElementById('logArea').classList.toggle('active', this.checked);
-        });
+        // 深度爬取默认关闭
 
         // ============= 主爬取流程 =============
         async function startCrawl() {
@@ -825,8 +816,8 @@
             
             hideAllResults();
 
-            const deepCrawl = document.getElementById('deepCrawl').checked;
-            const maxDepth = parseInt(document.getElementById('maxDepth').value) || 2;
+            const deepCrawl = false; // 深度爬取已禁用
+            const maxDepth = 2;
             const startTime = Date.now();
             let completed = 0;
             const totalTasks = [];
@@ -1048,7 +1039,7 @@
                 }
 
                 // 图片（支持多种懒加载属性 + 原图提取）
-                if (types.includes('image')) {
+                if (types.includes('image') || types.includes('hdimage')) {
                     const imageAttrs = ['src', 'data-src', 'data-original', 'data-lazy-src', 'data-srcset', 'srcset', 'data-url', 'data-large', 'data-hd', 'data-big', 'data-original-src'];
                     
                     doc.querySelectorAll('img').forEach(img => {
